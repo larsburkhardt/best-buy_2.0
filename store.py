@@ -34,14 +34,21 @@ class Store:
       order_product, order_quantity = item
 
       if order_product.quantity >= order_quantity:
-        order_price += order_product.price * order_quantity
+        # Überprüfen, ob eine Promotion für das Produkt vorhanden ist
+        if order_product.get_promotion() is not None:
+          promotion = order_product.get_promotion()
+          order_price += promotion.apply_promotion(order_product, order_quantity)
+        else:
+          order_price += order_product.price * order_quantity
+
         order_product.quantity -= order_quantity
 
-        # Deactivate product if it's out of stock
+        # Deaktiviere das Produkt, wenn der Bestand aufgebraucht ist
         if order_product.quantity == 0:
           order_product.deactivate()
       else:
         raise ValueError(f"Sorry, only {order_product.quantity} items of {order_product.name} in stock.")
 
-    return order_price
+      return order_price
 
+    return order_price

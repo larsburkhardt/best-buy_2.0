@@ -8,8 +8,6 @@ class Product:
     if price < 0 or quantity < 0:
       raise ValueError("Price and amount can't be negative")
 
-
-
     self.name = name
     self.price = price
     self.quantity = quantity
@@ -24,6 +22,14 @@ class Product:
     self.quantity = quantity
     if self.quantity <= 0:
       self.deactivate()
+
+  def get_promotion(self):
+    """get promotions """
+    return self.promotion
+
+  def set_promotion(self, promotion):
+    """set promotion to a product"""
+    self.promotion = promotion
 
   def is_active(self) -> bool:
     """Helper for checking if product is active"""
@@ -54,3 +60,30 @@ class Product:
       self.quantity -= quantity
       total_price = quantity * self.price
       return total_price
+
+
+class NonStockedProduct(Product):
+  """Subclass for products without tracking (digital product)"""
+
+  def __init__(self, name: str, price: int):
+    super().__init__(name, price, quantity=float('inf'))
+
+  def show(self):
+    return f"{self.name}: {self.price} (unlimited products in stock)"
+
+
+class LimitedProduct(Product):
+  """Subclass for products with a maximum quantity limit."""
+
+  def __init__(self, name: str, price: int, quantity: int, maximum: int):
+    super().__init__(name, price, quantity)
+    self.maximum = maximum
+
+  def show(self):
+    return f"{self.name}: {self.price} (only {self.quantity} available)"
+
+  def buy(self, quantity):
+    if quantity > self.quantity:
+      raise Exception(f'Cannot buy more than allowed, max: {self.quantity}')
+    self.quantity -= quantity
+    return self.price * quantity
